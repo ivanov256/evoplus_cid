@@ -6,43 +6,11 @@
 
 #define CID_SIZE 16
 #define PROGRAM_CID_OPCODE 26
-#define SAMSUNG_VENDOR_OPCODE 62
+
 
 int mmc_movi_vendor_cmd(unsigned int arg, int fd) {
 	int ret = 0;
 	struct mmc_ioc_cmd idata = {0};
-
-	idata.data_timeout_ns = 0x10000000;
-	idata.write_flag = 1;
-	idata.opcode = SAMSUNG_VENDOR_OPCODE;
-	idata.arg = arg;
-	idata.flags = MMC_RSP_R1B | MMC_CMD_AC;
-
-	ret = ioctl(fd, MMC_IOC_CMD, &idata);
-
-	return ret;
-}
-
-int cid_backdoor(int fd) {
-	int ret;
-
-	ret = mmc_movi_vendor_cmd(0xEFAC62EC, fd);
-	if (ret) {
-		printf("Failed to enter vendor mode. Genuine Samsung Evo Plus?\n");
-	} else {
-		ret = mmc_movi_vendor_cmd(0xEF50, fd);
-		if (ret) {
-			printf("Unlock command failed.\n");
-		} else {
-			ret = mmc_movi_vendor_cmd(0x00DECCEE, fd);
-			if (ret) {
-				printf("Failed to exit vendor mode.\n");
-			}
-		}
-	}
-
-	return ret;
-}
 
 int program_cid(int fd, const unsigned char *cid) {
 	int ret;
